@@ -7,7 +7,6 @@ import com.andrei1058.bedwars.api.arena.team.ITeam;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
 import com.andrei1058.bedwars.api.language.Language;
 import com.andrei1058.bedwars.api.language.Messages;
-import com.andrei1058.bedwars.api.server.ServerType;
 import com.andrei1058.bedwars.api.sidebar.ISidebar;
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.levels.internal.PlayerLevel;
@@ -15,7 +14,6 @@ import com.andrei1058.bedwars.stats.PlayerStats;
 import com.andrei1058.spigot.sidebar.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Contract;
@@ -126,7 +124,7 @@ public class BwSidebar implements ISidebar {
                         ITeam team = arena.getTeams().get(teamCount++);
                         String teamName = team.getDisplayName(language);
                         line = genericTeamFormat
-                                .replace("{TeamLetter}", String.valueOf(teamName.length() != 0 ? teamName.charAt(0) : ""))
+                                .replace("{TeamLetter}", String.valueOf(!teamName.isEmpty() ? teamName.charAt(0) : ""))
                                 .replace("{TeamColor}", team.getColor().chat().toString())
                                 .replace("{TeamName}", teamName)
                                 .replace("{TeamStatus}", "{Team" + team.getName() + "Status}");
