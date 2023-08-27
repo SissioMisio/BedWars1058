@@ -90,7 +90,6 @@ public class BwSidebar implements ISidebar {
             }, 2L);
         }
         handlePlayerList();
-        setHeaderFooter();
     }
 
     public Player getPlayer() {
@@ -349,29 +348,6 @@ public class BwSidebar implements ISidebar {
         }
 
         handleHealthIcon();
-
-        if (this.isTabFormattingDisabled()) {
-            return;
-        }
-
-        if (noArena()) {
-            // if tab formatting is enabled in lobby world
-            if (config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_LOBBY) &&
-                    !config.getLobbyWorldName().trim().isEmpty()) {
-
-                World lobby = Bukkit.getWorld(config.getLobbyWorldName());
-                if (null == lobby) {
-                    return;
-                }
-                lobby.getPlayers().forEach(inLobby -> giveUpdateTabFormat(inLobby, true));
-            }
-            return;
-        }
-
-        handleHealthIcon();
-
-        arena.getPlayers().forEach(playing -> giveUpdateTabFormat(playing, true));
-        arena.getSpectators().forEach(spectating -> giveUpdateTabFormat(spectating, true));
     }
 
     /**
@@ -395,9 +371,7 @@ public class BwSidebar implements ISidebar {
         }
 
         if (!skipStateCheck) {
-            if (this.isTabFormattingDisabled()) {
-                return;
-            }
+            return;
         }
 
         SidebarLine prefix;
@@ -516,57 +490,6 @@ public class BwSidebar implements ISidebar {
         teamTab.add(player);
     }
 
-    // Provide header and footer for current game state
-    private void setHeaderFooter() {
-//        if (isTabFormattingDisabled()) {
-//            return;
-//        }
-        Language lang = Language.getPlayerLanguage(player);
-
-        if (noArena()) {
-            SidebarManager.getInstance().sendHeaderFooter(
-                    player, lang.m(Messages.FORMATTING_SIDEBAR_TAB_HEADER_LOBBY),
-                    lang.m(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_LOBBY)
-            );
-            return;
-        }
-        if (arena.isSpectator(player)) {
-            SidebarManager.getInstance().sendHeaderFooter(
-                    player, lang.m(Messages.FORMATTING_SIDEBAR_TAB_HEADER_SPECTATOR),
-                    lang.m(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_SPECTATOR)
-            );
-            return;
-        }
-
-
-        String headerPath = null;
-        String footerPath = null;
-
-        switch (arena.getStatus()) {
-            case waiting:
-                headerPath = Messages.FORMATTING_SIDEBAR_TAB_HEADER_WAITING;
-                footerPath = Messages.FORMATTING_SIDEBAR_TAB_FOOTER_WAITING;
-                break;
-            case starting:
-                headerPath = Messages.FORMATTING_SIDEBAR_TAB_HEADER_STARTING;
-                footerPath = Messages.FORMATTING_SIDEBAR_TAB_FOOTER_STARTING;
-                break;
-            case playing:
-                headerPath = Messages.FORMATTING_SIDEBAR_TAB_HEADER_PLAYING;
-                footerPath = Messages.FORMATTING_SIDEBAR_TAB_FOOTER_PLAYING;
-                break;
-            case restarting:
-                headerPath = Messages.FORMATTING_SIDEBAR_TAB_HEADER_RESTARTING;
-                footerPath = Messages.FORMATTING_SIDEBAR_TAB_FOOTER_RESTARTING;
-                break;
-        }
-
-        SidebarManager.getInstance().sendHeaderFooter(
-                player, lang.m(headerPath),
-                lang.m(footerPath)
-        );
-    }
-
     private @NotNull String getTabName(@NotNull ITeam team) {
         String tabName = TEAM_PREFIX + Base64.getEncoder().encodeToString((team.getName()).getBytes(StandardCharsets.UTF_8));
         if (tabName.length() > 16) {
@@ -624,36 +547,7 @@ public class BwSidebar implements ISidebar {
      * @return true if tab formatting is disabled for current sidebar/ arena stage
      */
     public boolean isTabFormattingDisabled() {
-        if (noArena()) {
-
-            if (getServerType() == ServerType.SHARED) {
-                if (config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_LOBBY) &&
-                        !config.getLobbyWorldName().trim().isEmpty()) {
-
-                    World lobby = Bukkit.getWorld(config.getLobbyWorldName());
-                    return null != lobby;
-                }
-            }
-
-            return !config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_LOBBY);
-        }
-        // if tab formatting is disabled in game
-        if (arena.getStatus() == GameState.playing && config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_PLAYING)) {
-            return false;
-        }
-
-        // if tab formatting is disabled in starting
-        if (arena.getStatus() == GameState.starting && config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_STARTING)) {
-            return false;
-        }
-
-        // if tab formatting is disabled in waiting
-        if (arena.getStatus() == GameState.waiting && config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_WAITING)) {
-            return false;
-        }
-
-        // if tab formatting is disabled in restarting
-        return arena.getStatus() != GameState.restarting || !config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_LIST_FORMAT_RESTARTING);
+        return true;
     }
 
     @Override
@@ -713,9 +607,8 @@ public class BwSidebar implements ISidebar {
      * Hide player name tag on head when he drinks an invisibility potion.
      * This is required because not all clients hide it automatically.
      *
-     * @param _toggle true when applied, false when expired.
      */
-    public void handleInvisibilityPotion(@NotNull Player player, boolean _toggle) {
+    public void handleInvisibilityPotion(@NotNull Player player) {
         if (null == arena) {
             throw new RuntimeException("This can only be used when the player is in arena");
         }

@@ -48,7 +48,7 @@ public class InvisibilityPotionListener implements Listener {
     public void onPotion(@NotNull PlayerInvisibilityPotionEvent e) {
         if (e.getTeam() == null) return;
         SidebarService.getInstance().handleInvisibility(
-                e.getTeam(), e.getPlayer(), e.getType() == PlayerInvisibilityPotionEvent.Type.ADDED
+                e.getTeam(), e.getPlayer()
         );
     }
 

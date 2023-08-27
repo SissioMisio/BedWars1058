@@ -196,10 +196,10 @@ public class SidebarService implements ISidebarService {
         });
     }
 
-    public void handleInvisibility(ITeam team, Player player, boolean toggle) {
+    public void handleInvisibility(ITeam team, Player player) {
         this.sidebars.forEach((k,v) -> {
             if (null != v.getArena() && v.getArena().equals(team.getArena())) {
-                v.handleInvisibilityPotion(player, toggle);
+                v.handleInvisibilityPotion(player);
             }
         });
     }
