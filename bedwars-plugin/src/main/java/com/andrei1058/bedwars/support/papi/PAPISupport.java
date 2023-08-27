@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -41,6 +42,7 @@ import java.time.Instant;
 import static com.andrei1058.bedwars.api.language.Language.getMsg;
 
 public class PAPISupport extends PlaceholderExpansion {
+    public DecimalFormat df = new DecimalFormat("#.##");
 
     @NotNull
     @Override
@@ -145,6 +147,8 @@ public class PAPISupport extends PlaceholderExpansion {
                     return String.valueOf(stats.getBedsDestroyed());
                 case "gamesplayed":
                     return String.valueOf(stats.getGamesPlayed());
+                case "kdr":
+                    return String.valueOf(df.format((double) stats.getKills() / stats.getDeaths()));
             }
         }
 
