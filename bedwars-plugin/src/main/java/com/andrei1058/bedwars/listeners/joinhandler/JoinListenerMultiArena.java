@@ -22,7 +22,7 @@ package com.andrei1058.bedwars.listeners.joinhandler;
 
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.sidebar.SidebarService;
-import com.andrei1058.bedwars.support.paper.PaperSupport;
+import com.andrei1058.bedwars.support.paper.TeleportManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,7 +52,7 @@ public class JoinListenerMultiArena implements Listener {
         // Teleport to lobby location
         Location lobbyLocation = config.getConfigLoc("lobbyLoc");
         if (lobbyLocation != null && lobbyLocation.getWorld() != null) {
-            PaperSupport.teleport(p, lobbyLocation);
+            TeleportManager.teleport(p, lobbyLocation);
         }
 
         // Send items
