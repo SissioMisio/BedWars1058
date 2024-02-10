@@ -43,6 +43,8 @@ public class RejoinCommand extends BukkitCommand {
             return true;
         }
 
+        /*
+
         Player p = (Player) s;
 
         if (!p.hasPermission(Permissions.PERMISSION_REJOIN)) {
@@ -67,6 +69,10 @@ public class RejoinCommand extends BukkitCommand {
         p.sendMessage(Language.getMsg(p, Messages.REJOIN_ALLOWED).replace("{arena}", rj.getArena().getDisplayName()));
         Sounds.playSound("rejoin-allowed", p);
         rj.reJoin(p);
+        return true;
+
+         */
+        s.sendMessage("§cIl rejoin è completamente rotto.");
         return true;
     }
 }

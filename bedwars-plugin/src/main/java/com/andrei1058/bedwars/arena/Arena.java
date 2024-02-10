@@ -834,7 +834,8 @@ public class Arena implements IArena {
                 Bukkit.getScheduler().runTaskLater(BedWars.plugin, () -> changeStatus(GameState.restarting), 10L);
             } else if (!BedWars.isShuttingDown()) {
                 //ReJoin feature
-                new ReJoin(p, this, team, cacheList);
+                //no :3
+                //new ReJoin(p, this, team, cacheList);
             }
 
             // pvp log out
