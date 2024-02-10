@@ -573,10 +573,8 @@ public class BwSidebar implements ISidebar {
     /**
      * Hide player name tag on head when he drinks an invisibility potion.
      * This is required because not all clients hide it automatically.
-     *
-     * @param _toggle true when applied, false when expired.
      */
-    public void handleInvisibilityPotion(@NotNull Player player, boolean _toggle) {
+    public void handleInvisibilityPotion(@NotNull Player player) {
         if (null == arena) {
             throw new RuntimeException("This can only be used when the player is in arena");
         }
