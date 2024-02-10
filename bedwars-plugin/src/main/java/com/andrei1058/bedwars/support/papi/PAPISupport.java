@@ -147,8 +147,12 @@ public class PAPISupport extends PlaceholderExpansion {
                     return String.valueOf(stats.getBedsDestroyed());
                 case "gamesplayed":
                     return String.valueOf(stats.getGamesPlayed());
-                case "kdr":
+                case "kdr": {
+                    if (stats.getDeaths() == 0 && stats.getKills() == 0) {
+                        return "N/D";
+                    }
                     return String.valueOf(df.format((double) stats.getKills() / stats.getDeaths()));
+                }
             }
         }
 
