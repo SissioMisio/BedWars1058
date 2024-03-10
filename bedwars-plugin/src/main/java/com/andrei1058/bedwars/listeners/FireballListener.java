@@ -6,6 +6,7 @@ import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.arena.LastHit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -17,7 +18,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Collection;
 
 import static com.andrei1058.bedwars.BedWars.config;
 import static com.andrei1058.bedwars.BedWars.getAPI;
@@ -47,58 +48,91 @@ public class FireballListener implements Listener {
     @EventHandler
     public void fireballHit(ProjectileHitEvent e) {
         if(!(e.getEntity() instanceof Fireball)) return;
+
         Location location = e.getEntity().getLocation();
-
         ProjectileSource projectileSource = e.getEntity().getShooter();
-        if(!(projectileSource instanceof Player)) return;
-        Player source = (Player) projectileSource;
-
-        IArena arena = Arena.getArenaByPlayer(source);
-
         Vector vector = location.toVector();
-
         World world = location.getWorld();
 
-        assert world != null;
-        Collection<Entity> nearbyEntities = world
-                .getNearbyEntities(location, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
-        for(Entity entity : nearbyEntities) {
-            if(!(entity instanceof Player)) continue;
-            Player player = (Player) entity;
-            if(!getAPI().getArenaUtil().isPlaying(player)) continue;
 
+        if(!(projectileSource instanceof Player)) {
+            if (projectileSource instanceof ArmorStand) {
+                //se lanciata da un armorstand (evento dove piovono fireball)
+                ArmorStand source = (ArmorStand) projectileSource;
 
-            Vector playerVector = player.getLocation().toVector();
-            Vector normalizedVector = vector.subtract(playerVector).normalize();
-            Vector horizontalVector = normalizedVector.multiply(fireballHorizontal);
-            double y = normalizedVector.getY();
-            if(y < 0 ) y += 1.5;
-            if(y <= 0.5) {
-                y = fireballVertical*1.5; // kb for not jumping
-            } else {
-                y = y*fireballVertical*1.5; // kb for jumping
-            }
-            player.setVelocity(horizontalVector.setY(y));
+                assert world != null;
+                Collection<Entity> nearbyEntities = world
+                        .getNearbyEntities(location, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
+                for(Entity entity : nearbyEntities) {
+                    if(!(entity instanceof Player)) continue;
+                    Player player = (Player) entity;
+                    if(!getAPI().getArenaUtil().isPlaying(player)) continue;
 
-            LastHit lh = LastHit.getLastHit(player);
-            if (lh != null) {
-                lh.setDamager(source);
-                lh.setTime(System.currentTimeMillis());
-            } else {
-                new LastHit(player, source, System.currentTimeMillis());
-            }
-
-            if(player.equals(source)) {
-                if(damageSelf > 0) {
-                    player.damage(damageSelf); // damage shooter
+                    Vector playerVector = player.getLocation().toVector();
+                    Vector normalizedVector = vector.subtract(playerVector).normalize();
+                    Vector horizontalVector = normalizedVector.multiply(fireballHorizontal);
+                    double y = normalizedVector.getY();
+                    if(y < 0 ) y += 1.5;
+                    if(y <= 0.5) {
+                        y = fireballVertical*1.5; // kb for not jumping
+                    } else {
+                        y = y*fireballVertical*1.5; // kb for jumping
+                    }
+                    player.setVelocity(horizontalVector.setY(y));
+                    LastHit lh = LastHit.getLastHit(player);
+                    if (lh != null) {
+                        lh.setDamager(source);
+                        lh.setTime(System.currentTimeMillis());
+                    } else {
+                        new LastHit(player, source, System.currentTimeMillis());
+                    }
+                    player.damage(damageEnemy); // damage enemies (la fireball lanciata dal cielo avrà sempre il danno massimo)
                 }
-            } else if(arena.getTeam(player).equals(arena.getTeam(source))) {
-                if(damageTeammates > 0) {
-                    player.damage(damageTeammates); // damage teammates
+            }
+        } else {
+            //se lanciata da un player
+            Player source = (Player) projectileSource;
+            IArena arena = Arena.getArenaByPlayer(source);
+
+            assert world != null;
+            Collection<Entity> nearbyEntities = world
+                    .getNearbyEntities(location, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
+            for(Entity entity : nearbyEntities) {
+                if(!(entity instanceof Player)) continue;
+                Player player = (Player) entity;
+                if(!getAPI().getArenaUtil().isPlaying(player)) continue;
+
+                Vector playerVector = player.getLocation().toVector();
+                Vector normalizedVector = vector.subtract(playerVector).normalize();
+                Vector horizontalVector = normalizedVector.multiply(fireballHorizontal);
+                double y = normalizedVector.getY();
+                if(y < 0 ) y += 1.5;
+                if(y <= 0.5) {
+                    y = fireballVertical*1.5; // kb for not jumping
+                } else {
+                    y = y*fireballVertical*1.5; // kb for jumping
                 }
-            } else {
-                if(damageEnemy > 0) {
-                    player.damage(damageEnemy); // damage enemies
+                player.setVelocity(horizontalVector.setY(y));
+                LastHit lh = LastHit.getLastHit(player);
+                if (lh != null) {
+                    lh.setDamager(source);
+                    lh.setTime(System.currentTimeMillis());
+                } else {
+                    new LastHit(player, source, System.currentTimeMillis());
+                }
+
+                if(player.equals(source)) {
+                    if(damageSelf > 0) {
+                        player.damage(damageSelf); // damage shooter
+                    }
+                } else if(arena.getTeam(player).equals(arena.getTeam(source))) {
+                    if(damageTeammates > 0) {
+                        player.damage(damageTeammates); // damage teammates
+                    }
+                } else {
+                    if(damageEnemy > 0) {
+                        player.damage(damageEnemy); // damage enemies
+                    }
                 }
             }
         }
