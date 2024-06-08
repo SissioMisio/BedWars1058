@@ -2723,6 +2723,8 @@ public class Arena implements IArena {
                 return 2.0;
             case 4:
                 return 3.0;
+            case 5:
+                return 2.5;
             default:
                 //not handled
                 return null;
