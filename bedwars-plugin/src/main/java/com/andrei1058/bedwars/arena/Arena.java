@@ -2704,4 +2704,28 @@ public class Arena implements IArena {
     public GameStatsHolder getStatsHolder() {
         return gameStats;
     }
+
+    /**
+     * Get modifier multiplier
+     *
+     * @param mod mod id
+     */
+    public static Double getModMultiplier(Integer mod) {
+        switch (mod) {
+            case 0:
+                //senza modifier, normale
+                return 1.0;
+            case 1:
+                return 1.5;
+            case 2:
+                return 1.2;
+            case 3:
+                return 2.0;
+            case 4:
+                return 3.0;
+            default:
+                //not handled
+                return null;
+        }
+    }
 }
