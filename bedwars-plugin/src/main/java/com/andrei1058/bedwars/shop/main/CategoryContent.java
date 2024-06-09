@@ -27,6 +27,7 @@ import com.andrei1058.bedwars.api.arena.shop.ICategoryContent;
 import com.andrei1058.bedwars.api.arena.shop.IContentTier;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
 import com.andrei1058.bedwars.api.events.shop.ShopBuyEvent;
+import com.andrei1058.bedwars.api.events.shop.ShopCantBuyEvent;
 import com.andrei1058.bedwars.api.language.Language;
 import com.andrei1058.bedwars.api.language.Messages;
 import com.andrei1058.bedwars.arena.Arena;
@@ -167,6 +168,13 @@ public class CategoryContent implements ICategoryContent {
         //check money
         int money = calculateMoney(player, ct.getCurrency());
         if (money < ct.getPrice()) {
+            //EVENTO DI QUANDO NON HAI ABBASTANZA RISORSE PER COMPRARE
+            ShopCantBuyEvent event;
+            Bukkit.getPluginManager().callEvent(event = new ShopCantBuyEvent(player, Arena.getArenaByPlayer(player), this));
+
+            if (event.isCancelled()){
+                return;
+            }
             player.sendMessage(getMsg(player, Messages.SHOP_INSUFFICIENT_MONEY).replace("{currency}", getMsg(player, getCurrencyMsgPath(ct))).
                     replace("{amount}", String.valueOf(ct.getPrice() - money)));
             Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
