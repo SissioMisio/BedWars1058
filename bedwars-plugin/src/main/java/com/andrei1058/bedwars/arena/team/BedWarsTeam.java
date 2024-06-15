@@ -610,8 +610,11 @@ public class BedWarsTeam implements ITeam {
                 if (i == null) continue;
                 if (nms.isSword(i) || nms.isAxe(i)) {
                     ItemMeta im = i.getItemMeta();
-                    im.addEnchant(e, a, true);
-                    i.setItemMeta(im);
+                    //do not apply enchant if item has custom displayName
+                    if(!im.hasDisplayName()) {
+                        im.addEnchant(e, a, true);
+                        i.setItemMeta(im);
+                    }
                 }
             }
             p.updateInventory();
