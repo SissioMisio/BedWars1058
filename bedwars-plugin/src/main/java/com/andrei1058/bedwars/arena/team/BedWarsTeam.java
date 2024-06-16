@@ -28,6 +28,7 @@ import com.andrei1058.bedwars.api.arena.team.TeamColor;
 import com.andrei1058.bedwars.api.arena.team.TeamEnchant;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
 import com.andrei1058.bedwars.api.events.player.PlayerFirstSpawnEvent;
+import com.andrei1058.bedwars.api.events.player.PlayerGetsDefaultSwordEvent;
 import com.andrei1058.bedwars.api.events.player.PlayerReSpawnEvent;
 import com.andrei1058.bedwars.api.language.Language;
 import com.andrei1058.bedwars.api.language.Messages;
@@ -239,6 +240,12 @@ public class BedWarsTeam implements ITeam {
                             }
                         }
                         if (!hasSword) {
+                            PlayerGetsDefaultSwordEvent event;
+                            Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
+
+                            if (event.isCancelled()) {
+                                return; // se l'evento del give della spada viene annullato mi fermo
+                            }
                             p.getInventory().addItem(i);
                         }
                     } else if (BedWars.nms.isBow(i)) {
@@ -266,6 +273,16 @@ public class BedWarsTeam implements ITeam {
 
     public void defaultSword(Player p, boolean sword) {
         if (!sword) return;
+
+        PlayerGetsDefaultSwordEvent event;
+        Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
+
+        if (event.isCancelled()){
+            return; // se l'evento del give della spada viene annullato mi fermo
+        }
+
+
+
         String path = config.getYml().get(ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + "." + arena.getGroup()) == null ?
                 ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + ".Default" : ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + "." + arena.getGroup();
         for (String s : config.getYml().getStringList(path)) {
