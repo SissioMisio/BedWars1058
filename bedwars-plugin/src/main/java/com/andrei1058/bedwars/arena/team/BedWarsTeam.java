@@ -240,13 +240,18 @@ public class BedWarsTeam implements ITeam {
                             }
                         }
                         if (!hasSword) {
-                            PlayerGetsDefaultSwordEvent event;
-                            Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
+                            boolean give = true;
+                            if(i.getType() == Material.WOOD_SWORD) {
+                                PlayerGetsDefaultSwordEvent event;
+                                Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
 
-                            if (event.isCancelled()) {
-                                return; // se l'evento del give della spada viene annullato mi fermo
+                                if (event.isCancelled()) {
+                                    give = false; // se l'evento del give della spada viene annullato mi fermo
+                                }
                             }
-                            p.getInventory().addItem(i);
+                            if(give) {
+                                p.getInventory().addItem(i);
+                            }
                         }
                     } else if (BedWars.nms.isBow(i)) {
                         boolean hasBow = false;
@@ -273,16 +278,6 @@ public class BedWarsTeam implements ITeam {
 
     public void defaultSword(Player p, boolean sword) {
         if (!sword) return;
-
-        PlayerGetsDefaultSwordEvent event;
-        Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
-
-        if (event.isCancelled()){
-            return; // se l'evento del give della spada viene annullato mi fermo
-        }
-
-
-
         String path = config.getYml().get(ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + "." + arena.getGroup()) == null ?
                 ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + ".Default" : ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + "." + arena.getGroup();
         for (String s : config.getYml().getStringList(path)) {
@@ -320,7 +315,15 @@ public class BedWarsTeam implements ITeam {
                     i = nms.addCustomData(i, "DEFAULT_ITEM");
 
                     if (BedWars.nms.isSword(i)) {
-                        p.getInventory().addItem(i);
+                        if(i.getType() == Material.WOOD_SWORD) {
+                            PlayerGetsDefaultSwordEvent event;
+                            Bukkit.getPluginManager().callEvent(event = new PlayerGetsDefaultSwordEvent(p));
+
+                            if (!event.isCancelled()){
+                                p.getInventory().addItem(i);
+                            }
+                        }
+
                         break;
                     }
                 } catch (Exception ignored) {
