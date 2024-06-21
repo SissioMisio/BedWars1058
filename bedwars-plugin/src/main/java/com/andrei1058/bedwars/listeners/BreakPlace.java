@@ -41,6 +41,7 @@ import com.andrei1058.bedwars.popuptower.TowerEast;
 import com.andrei1058.bedwars.popuptower.TowerNorth;
 import com.andrei1058.bedwars.popuptower.TowerSouth;
 import com.andrei1058.bedwars.popuptower.TowerWest;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -363,10 +364,15 @@ public class BreakPlace implements Listener {
                 }
             }
 
+
+
+
             if (!a.isAllowMapBreak()) {
-                if (!a.isBlockPlaced(e.getBlock())) {
-                    p.sendMessage(getMsg(p, Messages.INTERACT_CANNOT_BREAK_BLOCK));
-                    e.setCancelled(true);
+                if(!PlaceholderAPI.setPlaceholders(a.getPlayers().get(0), "%mercuriorandomevents_canbreakblocks_" + a.getArenaName().toLowerCase() + "%").equals("yessir")) { //player player a cazzo perché non può essere null
+                    if (!a.isBlockPlaced(e.getBlock())) {
+                        p.sendMessage(getMsg(p, Messages.INTERACT_CANNOT_BREAK_BLOCK));
+                        e.setCancelled(true);
+                    }
                 }
             }
         }
