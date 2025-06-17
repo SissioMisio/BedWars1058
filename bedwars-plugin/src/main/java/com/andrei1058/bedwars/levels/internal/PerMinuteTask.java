@@ -47,11 +47,12 @@ public class PerMinuteTask {
             return;
         }
         int actualXP = xp;
-        int currentMod = Integer.parseInt(PlaceholderAPI.setPlaceholders(arena.getPlayers().get(0), "%mercuriorandomevents_currentmodifier_num%"));
+        String currentMod = PlaceholderAPI.setPlaceholders(arena.getPlayers().get(0), "%mercuriorandomevents_currentmodifier_eventtype%");
         String currentModName = PlaceholderAPI.setPlaceholders(arena.getPlayers().get(0), "%mercuriorandomevents_currentmodifier%");
         Double multiplier = getModMultiplier(currentMod);
+        boolean isModifier = !currentMod.equals("NESSUNO");
 
-        if (currentMod != 0) { //se c'è un modifier
+        if (isModifier) { //se c'è un modifier
             if(multiplier != null) {
                 actualXP *= multiplier;
             } else {
@@ -64,7 +65,7 @@ public class PerMinuteTask {
             for (Player p : arena.getPlayers()) {
                 PlayerLevel.getLevelByPlayer ( p.getUniqueId () ).addXp (finalActualXP, PlayerXpGainEvent.XpSource.PER_MINUTE );
 
-                if(currentMod != 0 && multiplier != null) {
+                if(isModifier && multiplier != null) {
                     p.sendMessage ("§6+" + finalActualXP + " XP: " + xp + " * " + multiplier + " (" + currentModName + ") -- (Tempo giocato).");
                 } else {
                     p.sendMessage ( Language.getMsg ( p, Messages.XP_REWARD_PER_MINUTE ).replace ( "{xp}", String.valueOf ( finalActualXP ) ) );

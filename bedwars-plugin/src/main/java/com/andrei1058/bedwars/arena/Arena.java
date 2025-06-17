@@ -2708,22 +2708,22 @@ public class Arena implements IArena {
     /**
      * Get modifier multiplier
      *
-     * @param mod mod id
+     * @param modifier modifier id
      */
-    public static Double getModMultiplier(Integer mod) {
-        switch (mod) {
-            case 0:
+    public static Double getModMultiplier(String modifier) {
+        switch (modifier) {
+            case "NESSUNO":
                 //senza modifier, normale
                 return 1.0;
-            case 1:
+            case "KILL_OGGETTO_RANDOM":
                 return 1.5;
-            case 2:
+            case "OGGETTO_RANDOM_MINUTO":
                 return 1.2;
-            case 3:
+            case "EFFETTO_RANDOM_MINUTO":
                 return 2.0;
-            case 4:
+            case "PIOGGIA_FIREBALL":
                 return 3.0;
-            case 5:
+            case "LUCKYBLOCK":
                 return 2.5;
             default:
                 //not handled
