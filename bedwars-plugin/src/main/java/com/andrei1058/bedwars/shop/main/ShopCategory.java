@@ -21,9 +21,12 @@
 package com.andrei1058.bedwars.shop.main;
 
 import com.andrei1058.bedwars.BedWars;
+import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.configuration.ConfigPath;
+import com.andrei1058.bedwars.api.events.shop.ShopInventoryUpdateEvent;
 import com.andrei1058.bedwars.api.language.Language;
 import com.andrei1058.bedwars.api.language.Messages;
+import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.shop.ShopCache;
 import com.andrei1058.bedwars.shop.ShopManager;
 import org.bukkit.Bukkit;
@@ -34,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -136,9 +140,16 @@ public class ShopCategory {
 
         shopCache.setSelectedCategory(getSlot());
 
+        HashMap<String, Integer> identifiersSlots = new HashMap<>();
         for (CategoryContent cc : getCategoryContentList()) {
-            inv.setItem(cc.getSlot(), cc.getItemStack(player, shopCache));
+            int slot = cc.getSlot();
+            inv.setItem(slot, cc.getItemStack(player, shopCache));
+            identifiersSlots.put(cc.getIdentifier(), slot);
         }
+
+        IArena arena = Arena.getArenaByPlayer(player);
+        ShopInventoryUpdateEvent event = new ShopInventoryUpdateEvent(identifiersSlots, arena, player, inv);
+        Bukkit.getPluginManager().callEvent(event);
 
         player.openInventory(inv);
         if (!categoryViewers.contains(player.getUniqueId())){

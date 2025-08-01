@@ -21,11 +21,14 @@
 package com.andrei1058.bedwars.shop.main;
 
 import com.andrei1058.bedwars.BedWars;
+import com.andrei1058.bedwars.api.arena.IArena;
+import com.andrei1058.bedwars.api.events.shop.ShopInventoryUpdateEvent;
 import com.andrei1058.bedwars.api.events.shop.ShopOpenEvent;
 import com.andrei1058.bedwars.api.language.Language;
 import com.andrei1058.bedwars.arena.Arena;
 import com.andrei1058.bedwars.shop.ShopCache;
 import com.andrei1058.bedwars.shop.quickbuy.PlayerQuickBuyCache;
+import com.andrei1058.bedwars.shop.quickbuy.QuickBuyElement;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -33,6 +36,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,9 +81,10 @@ public class ShopIndex {
     public void open(Player player, PlayerQuickBuyCache quickBuyCache, boolean callEvent) {
 
         if (quickBuyCache == null) return;
+        IArena arena = Arena.getArenaByPlayer(player);
 
         if (callEvent) {
-            ShopOpenEvent event = new ShopOpenEvent(player, Arena.getArenaByPlayer(player));
+            ShopOpenEvent event = new ShopOpenEvent(player, arena);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) return;
         }
@@ -95,10 +100,20 @@ public class ShopIndex {
         addSeparator(player, inv);
 
         inv.setItem(getQuickBuyButton().getSlot() + 9, getSelectedItem(player));
-        //noinspection ConstantConditions
-        ShopCache.getShopCache(player.getUniqueId()).setSelectedCategory(getQuickBuyButton().getSlot());
 
-        quickBuyCache.addInInventory(inv, ShopCache.getShopCache(player.getUniqueId()));
+        ShopCache shopCache = ShopCache.getShopCache(player.getUniqueId());
+
+        //noinspection ConstantConditions
+        shopCache.setSelectedCategory(getQuickBuyButton().getSlot());
+        quickBuyCache.addInInventory(inv, shopCache);
+
+        HashMap<String, Integer> identifiersSlots = new HashMap<>();
+        for (QuickBuyElement quickBuyElement : quickBuyCache.getElements()) {
+            String identifier = quickBuyElement.getCategoryContent().getIdentifier();
+            identifiersSlots.put(identifier, quickBuyElement.getSlot());
+        }
+        ShopInventoryUpdateEvent event = new ShopInventoryUpdateEvent(identifiersSlots, arena, player, inv);
+        Bukkit.getPluginManager().callEvent(event);
 
         player.openInventory(inv);
         if (!indexViewers.contains(player.getUniqueId())) {
